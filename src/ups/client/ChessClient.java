@@ -27,20 +27,21 @@ public class ChessClient
             out = sock.getOutputStream();
             in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-            String line = "hey\n";
-            String responseline = null;
+            String line = "b2c4\n";
+            String response = null;
             char[] strArray;
             strArray = line.toCharArray();
 
             while (true)
             {
+                response = in.readLine();
+                System.out.println("response = " + response);
                 for (int index = 0; index < strArray.length; index++)
                 {
                     out.write(strArray[index]);
                 }
                 out.flush();
                 System.out.println("data sent ");
-                System.out.println("val returned = " + in.readLine());
             }
         }
         catch (IOException ioe)
