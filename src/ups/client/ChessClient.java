@@ -40,7 +40,7 @@ public class ChessClient
                 }
                 out.flush();
                 System.out.println("data sent ");
-                System.out.println("val returned" + in.readLine());
+                System.out.println("val returned = " + in.readLine());
             }
         }
         catch (IOException ioe)
