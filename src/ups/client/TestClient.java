@@ -20,11 +20,13 @@ public class TestClient
         */
         String ip = "10.0.0.142";
         int port = 10001;
+        
+        Player p1 = null, p2 = null;
 
         try
         {
-            Player p1 = new Player(new Socket(ip, port), Color.WHITE);
-            Player p2 = new Player(new Socket(ip, port), Color.BLACK);
+            p1 = new Player(new Socket(ip, port), Color.WHITE);
+            p2 = new Player(new Socket(ip, port), Color.BLACK);
             
             if (p1.isConnected())
             {
@@ -69,8 +71,14 @@ public class TestClient
         }
         finally
         {
-            p1.closeConnection();
-            p2.closeConnection();
+            if (p1 != null)
+            {
+                p1.closeConnection();
+            }
+            if (p2 != null)
+            {
+                p2.closeConnection();
+            }
         }
     }
 }
