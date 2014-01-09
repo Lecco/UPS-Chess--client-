@@ -29,6 +29,19 @@ public class Receiver
     }
     
     /**
+     * Close stream
+     * 
+     * @throws IOException 
+     */
+    public void closeConnection() throws IOException
+    {
+        if (reader != null)
+        {
+            reader.close();
+        }
+    }
+    
+    /**
      * Read data from server
      * 
      * @return Response from server

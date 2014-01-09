@@ -96,6 +96,23 @@ public class Player
         return r.isSuccess();
     }
     
+    public void closeConnection()
+    {
+        try
+        {
+            receiver.closeConnection();
+            sender.closeConnection();
+            if (socket != null)
+            {
+                socket.close();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
     /**
      * Get parameter of response (for example message from server)
      * 

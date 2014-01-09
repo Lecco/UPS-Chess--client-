@@ -37,15 +37,12 @@ public class TestClient
             }
             
             String game[] = new String[]{"e2e4\n", "e7e4\n", "e5e6\n", "b8a6\n"};
-            
-            //Scanner sc = new Scanner(System.in);
-
+            char[] move;
             for (int i = 0; i < game.length; i++)
             {
+                move = game[i].toCharArray();
                 if (i % 2 == 0)
                 {
-                    //System.out.println("Your move: ");
-                    char[] move = game[i].toCharArray();
                     if (!p1.sendMove(move))
                     {
                         System.out.println(p1.getResponseParam());
@@ -56,28 +53,13 @@ public class TestClient
                 }
                 else
                 {
-                    //System.out.println("Your move: ");
-                    char[] move = game[i].toCharArray();
-                    for (int j = 0; j < move.length; j++)
+                    if (!p2.sendMove(move))
                     {
-                        out2.write(move[j]);
-                    }
-                    out2.flush();
-                    response = in2.readLine();
-                    System.out.println("2.response = " + response);
-                    if (response.equals("FAIL"))
-                    {
-                        if (i == 1)
-                        {
-                            game[i] = "e7e5\n";
-                        }
-                        response = in2.readLine();
-                        System.out.println("2.Message = " + response);
+                        System.out.println(p2.getResponseParam());
                         i--;
                         continue;
                     }
-                    response = in2.readLine();
-                    System.out.println("2.Message = " + response);
+                    System.out.println(p2.getResponseParam());
                 }
             }
         }
@@ -87,34 +69,8 @@ public class TestClient
         }
         finally
         {
-            if (in1 != null)
-            {
-                in1.close();
-            }
-
-            if (out1 != null)
-            {
-                out1.close();
-            }
-            if (sock1 != null)
-            {
-                sock1.close();
-            }
-            
-            if (in2 != null)
-            {
-                in2.close();
-            }
-
-            if (out2 != null)
-            {
-                out2.close();
-            }
-            if (sock2 != null)
-            {
-                sock2.close();
-            }
-            
+            p1.closeConnection();
+            p2.closeConnection();
         }
     }
 }

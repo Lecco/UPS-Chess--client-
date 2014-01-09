@@ -44,6 +44,19 @@ public class Sender
     }
     
     /**
+     * Close stream
+     * 
+     * @throws IOException 
+     */
+    public void closeConnection() throws IOException
+    {
+        if (output != null)
+        {
+            output.close();
+        }
+    }
+    
+    /**
      * Set new output stream
      * 
      * @param output New output stream
