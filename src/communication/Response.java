@@ -1,5 +1,5 @@
 
-package receiver;
+package communication;
 
 /**
  * Instances of {@code Response} are responses from chess server
