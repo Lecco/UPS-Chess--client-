@@ -23,7 +23,7 @@ public class Response
      * Other parameters of response
      */
     private String param;
-    
+
     /**
      * Create new {@code Response} from chess server response
      * 
@@ -45,6 +45,46 @@ public class Response
     public Response(String type, String param)
     {
         this.type = type;
+        this.param = param;
+    }
+    
+    /**
+     * Return type of response
+     * 
+     * @return Type (STATUS, MESSAGE..)
+     */
+    public String getType()
+    {
+        return type;
+    }
+
+    /**
+     * Set type to response
+     * 
+     * @param type New type of response
+     */
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    /**
+     * Get param of response (SUCCESS, message text..)
+     * 
+     * @return Parameter of response
+     */
+    public String getParam()
+    {
+        return param;
+    }
+
+    /**
+     * Set new param to response
+     * 
+     * @param param New parameter of response
+     */
+    public void setParam(String param)
+    {
         this.param = param;
     }
     
