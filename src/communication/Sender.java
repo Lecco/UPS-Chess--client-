@@ -1,6 +1,7 @@
 
 package communication;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -25,6 +26,21 @@ public class Sender
     public Sender(OutputStream output)
     {
         this.output = output;
+    }
+    
+    /**
+     * Send data to server
+     * 
+     * @param move Move of chess piece
+     * @throws IOException 
+     */
+    public void send(char[] move) throws IOException
+    {
+        for (int j = 0; j < move.length; j++)
+        {
+            output.write(move[j]);
+        }
+        output.flush();
     }
     
     /**

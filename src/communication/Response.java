@@ -49,6 +49,23 @@ public class Response
     }
     
     /**
+     * Return true if response is status succes
+     * 
+     * @return true = success
+     */
+    public boolean isSuccess()
+    {
+        if (type.equals(ResponseType.STATUS))
+        {
+            if (param.equals(ResponseParam.SUCCESS))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
      * Return type of response
      * 
      * @return Type (STATUS, MESSAGE..)

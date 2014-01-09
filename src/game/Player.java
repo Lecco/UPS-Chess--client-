@@ -2,6 +2,9 @@
 package game;
 
 import communication.Receiver;
+import communication.Response;
+import communication.ResponseParam;
+import communication.ResponseType;
 import communication.Sender;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,28 +43,67 @@ public class Player
     /**
      * Create new instance of {@code Player}
      * 
-     * @param socket Socket for connecting to server
-     * @throws IOException 
+     * @param socket Socket for connecting to server 
      */
-    public Player(Socket socket) throws IOException
+    public Player(Socket socket)
     {
         this.socket = socket;
-        this.receiver = new Receiver(new BufferedReader(new InputStreamReader(socket.getInputStream())));
-        this.sender = new Sender(socket.getOutputStream());
+        try
+        {
+            this.receiver = new Receiver(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+            this.sender = new Sender(socket.getOutputStream());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
     
     /**
      * Create new player with color
      * 
      * @param socket Socket for connecting to server
-     * @param color Color of player
+     * @param color Color of player 
+     */
+    public Player(Socket socket, Color color)
+    {
+        this(socket);
+        this.color = color;
+    }
+    
+    /**
+     * Check if player is connected
+     * 
+     * @return True if user is connected
+     */
+    public boolean isConnected()
+    {
+        Response r = receiver.getResponse();
+        return r.isSuccess();
+    }
+    
+    /**
+     * Send move to server and return true if it was succesful
+     * 
+     * @param move Move to perform
+     * @return True if move was successful
      * @throws IOException 
      */
-    public Player(Socket socket, Color color) throws IOException
+    public boolean sendMove(char[] move) throws IOException
     {
-        this.socket = socket;
-        this.receiver = new Receiver(new BufferedReader(new InputStreamReader(socket.getInputStream())));
-        this.sender = new Sender(socket.getOutputStream());
-        this.color = color;
+        sender.send(move);
+        Response r = receiver.getResponse();
+        return r.isSuccess();
+    }
+    
+    /**
+     * Get parameter of response (for example message from server)
+     * 
+     * @return Parameter of message
+     */
+    public String getResponseParam()
+    {
+        Response r = receiver.getResponse();
+        return r.getParam();
     }
 }

@@ -33,9 +33,17 @@ public class Receiver
      * 
      * @return Response from server
      */
-    public Response getResponse() throws IOException
+    public Response getResponse()
     {
-        return new Response(reader.readLine());
+        try
+        {
+            return new Response(reader.readLine());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
     }
     
     /**

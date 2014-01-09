@@ -1,6 +1,8 @@
 package ups.client;
 
 
+import game.Color;
+import game.Player;
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
@@ -18,36 +20,18 @@ public class TestClient
         */
         String ip = "10.0.0.142";
         int port = 10001;
-        BufferedReader in1 = null;
-        OutputStream out1 = null;
-        Socket sock1 = null;
-        
-        BufferedReader in2 = null;
-        OutputStream out2 = null;
-        Socket sock2 = null;
-        
 
         try
         {
-            String response = null;
+            Player p1 = new Player(new Socket(ip, port), Color.WHITE);
+            Player p2 = new Player(new Socket(ip, port), Color.BLACK);
             
-            sock1 = new Socket(ip, port);
-            out1 = sock1.getOutputStream();
-            in1 = new BufferedReader(new InputStreamReader(sock1.getInputStream()));
-            
-            response = in1.readLine();
-            System.out.println("response = " + response);
-            if (response.equals("SUCCESS"))
+            if (p1.isConnected())
             {
                 System.out.println("1.You are now connected.\n");
             }
             
-            sock2 = new Socket(ip, port);
-            out2 = sock2.getOutputStream();
-            in2 = new BufferedReader(new InputStreamReader(sock2.getInputStream()));
-            
-            response = in2.readLine();
-            if (response.equals("SUCCESS"))
+            if (p2.isConnected())
             {
                 System.out.println("2.You are now connected.\n");
             }
@@ -62,22 +46,13 @@ public class TestClient
                 {
                     //System.out.println("Your move: ");
                     char[] move = game[i].toCharArray();
-                    for (int j = 0; j < move.length; j++)
+                    if (!p1.sendMove(move))
                     {
-                        out1.write(move[j]);
-                    }
-                    out1.flush();
-                    response = in1.readLine();
-                    System.out.println("1.response = " + response);
-                    if (response.equals("FAIL"))
-                    {
-                        //response = in1.readLine();
-                        //System.out.println("1.Message = " + response);
+                        System.out.println(p1.getResponseParam());
                         i--;
                         continue;
                     }
-                    response = in1.readLine();
-                    System.out.println("1.Message = " + response);
+                    System.out.println(p1.getResponseParam());
                 }
                 else
                 {
