@@ -58,7 +58,11 @@ public class TestClient
                 }
             }
             
-            String game[] = new String[]{"e2e4\n", "e7e5\n", "d2d3\n", "b8a6\n"};
+            // String game[] = new String[]{"e2e4\n", "e7e5\n", "d2d3\n", "b8a6\n"};
+            // Fool's mate
+            // String game[] = new String[]{"f2f3\n", "e7e5\n", "g2g4\n", "d8h4\n"};
+            // Shortest stalemate
+            String game[] = new String[]{"e2e3\n", "a7a5\n", "d1h5\n", "a8a6\n", "h5a5\n", "h7h5\n", "h2h4\n", "a6h6\n", "a5c7\n", "f7f6\n", "c7d7\n", "e8f7\n", "d7b7\n", "d8d3\n", "b7b8\n", "d3h7\n", "b8c8\n", "f7g6\n", "c8e6\n"};
             char[] move;
             
             Player p = p1;
