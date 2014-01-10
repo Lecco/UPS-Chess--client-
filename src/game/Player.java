@@ -3,8 +3,6 @@ package game;
 
 import communication.Receiver;
 import communication.Response;
-import communication.ResponseParam;
-import communication.ResponseType;
 import communication.Sender;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -95,7 +93,10 @@ public class Player
         Response r = receiver.getResponse();
         return r.isSuccess();
     }
-    
+
+    /**
+     * Close connection of player to server
+     */
     public void closeConnection()
     {
         try
@@ -122,5 +123,25 @@ public class Player
     {
         Response r = receiver.getResponse();
         return r.getParam();
+    }
+    
+    /**
+     * Set color of player
+     * 
+     * @param color Color of player chesspieces
+     */
+    public void setColor(Color color)
+    {
+        this.color = color;
+    }
+    
+    /**
+     * Get player color
+     * 
+     * @return Color of player
+     */
+    public Color getColor()
+    {
+        return this.color;
     }
 }

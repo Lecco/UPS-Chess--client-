@@ -50,7 +50,8 @@ public class Receiver
     {
         try
         {
-            return new Response(reader.readLine());
+            String text = reader.readLine();
+            return new Response(text);
         }
         catch (IOException e)
         {

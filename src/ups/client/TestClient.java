@@ -18,51 +18,65 @@ public class TestClient
             System.exit(0);
         }
         */
-        String ip = "10.0.0.142";
+        String ip = "10.0.0.139";
         int port = 10001;
         
         Player p1 = null, p2 = null;
 
         try
         {
-            p1 = new Player(new Socket(ip, port), Color.WHITE);
-            p2 = new Player(new Socket(ip, port), Color.BLACK);
+            p1 = new Player(new Socket(ip, port));
+            p2 = new Player(new Socket(ip, port));
             
             if (p1.isConnected())
             {
                 System.out.println("1.You are now connected.\n");
+                if (p1.getResponseParam().equals(Color.WHITE.toString()))
+                {
+                    System.out.println("Player 1 is white");
+                    p1.setColor(Color.WHITE);
+                }
+                else
+                {
+                    System.out.println("Player 1 is black");
+                    p1.setColor(Color.BLACK);
+                }
             }
             
             if (p2.isConnected())
             {
                 System.out.println("2.You are now connected.\n");
-            }
-            
-            String game[] = new String[]{"e2e4\n", "e7e4\n", "e5e6\n", "b8a6\n"};
-            char[] move;
-            for (int i = 0; i < game.length; i++)
-            {
-                move = game[i].toCharArray();
-                if (i % 2 == 0)
+                if (p2.getResponseParam().equals(Color.WHITE.toString()))
                 {
-                    if (!p1.sendMove(move))
-                    {
-                        System.out.println(p1.getResponseParam());
-                        i--;
-                        continue;
-                    }
-                    System.out.println(p1.getResponseParam());
+                    System.out.println("Player 2 is white");
+                    p2.setColor(Color.WHITE);
                 }
                 else
                 {
-                    if (!p2.sendMove(move))
-                    {
-                        System.out.println(p2.getResponseParam());
-                        i--;
-                        continue;
-                    }
-                    System.out.println(p2.getResponseParam());
+                    System.out.println("Player 2 is black");
+                    p2.setColor(Color.BLACK);
                 }
+            }
+            
+            String game[] = new String[]{"e2e4\n", "e7e5\n", "d2d3\n", "b8a6\n"};
+            char[] move;
+            
+            Player p = p1;
+            
+            for (int i = 0; i < game.length; i++)
+            {
+                System.out.println("MOVE " + (i + 1));
+                move = game[i].toCharArray();
+                
+                if (!p.sendMove(move))
+                {
+                    System.out.println(p.getResponseParam());
+                    i--;
+                    continue;
+                }
+                System.out.println(p.getResponseParam());
+                
+                p = (p == p1) ? p2 : p1;
             }
         }
         catch (IOException ioe)

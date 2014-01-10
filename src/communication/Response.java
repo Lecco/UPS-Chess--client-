@@ -55,9 +55,9 @@ public class Response
      */
     public boolean isSuccess()
     {
-        if (type.equals(ResponseType.STATUS))
+        if (type.equals(ResponseType.STATUS.toString()))
         {
-            if (param.equals(ResponseParam.SUCCESS))
+            if (param.equals(ResponseParam.SUCCESS.toString()))
             {
                 return true;
             }
