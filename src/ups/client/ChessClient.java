@@ -44,6 +44,7 @@ public class ChessClient
             {
                 System.out.println("MOVE " + (++moveNumber));
                 move = sc.nextLine();
+                move += "\n";
                 
                 if (!p.sendMove(move.toCharArray()))
                 {
