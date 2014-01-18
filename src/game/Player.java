@@ -126,6 +126,14 @@ public class Player
     }
     
     /**
+     * @return Response from server
+     */
+    public Response getResponse()
+    {
+        return receiver.getResponse();
+    }
+    
+    /**
      * Set color of player
      * 
      * @param color Color of player chesspieces

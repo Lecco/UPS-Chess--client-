@@ -1,6 +1,7 @@
 package ups.client;
 
 
+import communication.Response;
 import game.*;
 import java.net.*;
 import java.io.*;
@@ -38,21 +39,54 @@ public class ChessClient
             
             String move;
             Scanner sc = new Scanner(System.in);
-            int moveNumber = 0;
+            Response r;
             
-            while (game.getStatus() != Game.STATUS_CHECKMATE && game.getStatus() != Game.STATUS_STALEMATE)
+            for (int moveNumber = 1; game.getStatus() != Game.STATUS_CHECKMATE && game.getStatus() != Game.STATUS_STALEMATE; moveNumber++)
             {
-                System.out.println("MOVE " + (++moveNumber));
-                move = sc.nextLine();
-                move += "\n";
-                
-                if (!p.sendMove(move.toCharArray()))
+                System.out.println("MOVE " + moveNumber);
+                if ((p.getColor() == Color.WHITE && moveNumber % 2 == 1) || (p.getColor() == Color.BLACK && moveNumber % 2 == 0))
                 {
-                    System.out.println(p.getResponseParam());
-                    continue;
+                    move = sc.nextLine();
+                    move += "\n";
+
+                    if (!p.sendMove(move.toCharArray()))
+                    {
+                        r = p.getResponse();
+                        if (r.isMessage())
+                        {
+                            System.out.println(r.getParam());
+                        }
+                        continue;
+                    }
+                    r = p.getResponse();
+                    if (r.isMessage())
+                    {
+                        System.out.println(r.getParam());
+                    }
                 }
-                System.out.println(p.getResponseParam());
-                
+                else
+                {
+                    System.out.print("Incoming move: ");
+                    r = p.getResponse();
+                    if (r.isMove())
+                    {
+                        System.out.println(r.getParam());
+                    }
+                }
+                System.out.print("Game status: ");
+                r = p.getResponse();
+                if (r.isGameStatus())
+                {
+                    System.out.println(r.getParam());
+                    if (r.getParam().equals(Game.STATUS_CHECKMATE))
+                    {
+                        game.setStatus(Game.STATUS_CHECKMATE);
+                    }
+                    if (r.getParam().equals(Game.STATUS_STALEMATE))
+                    {
+                        game.setStatus(Game.STATUS_STALEMATE);
+                    }
+                }
             }
         }
         catch (IOException ioe)

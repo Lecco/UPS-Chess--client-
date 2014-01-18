@@ -10,13 +10,13 @@ package game;
  */
 public class Game
 {
-    public final static int STATUS_DEFAULT = 0;
-    public final static int STATUS_CHECK = 1;
-    public final static int STATUS_CHECKMATE = 2;
-    public final static int STATUS_STALEMATE = 3;
+    public final static String STATUS_DEFAULT = "DEFAULT";
+    public final static String STATUS_CHECK = "CHECK";
+    public final static String STATUS_CHECKMATE = "CHECKMATE";
+    public final static String STATUS_STALEMATE = "STALEMATE";
     
     private ChessBoard chessboard;
-    private int status;
+    private String status;
     
     
     public Game(ChessBoard chessboard)
@@ -35,12 +35,12 @@ public class Game
         this.chessboard = chessboard;
     }
 
-    public int getStatus()
+    public String getStatus()
     {
         return status;
     }
 
-    public void setStatus(int status)
+    public void setStatus(String status)
     {
         this.status = status;
     }

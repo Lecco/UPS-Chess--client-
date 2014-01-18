@@ -66,6 +66,30 @@ public class Response
     }
     
     /**
+     * @return True if response is message from server
+     */
+    public boolean isMessage()
+    {
+        return this.type.equals(ResponseType.MESSAGE.name());
+    }
+    
+    /**
+     * @return True if response is chess move
+     */
+    public boolean isMove()
+    {
+        return this.type.equals(ResponseType.MOVE.name());
+    }
+    
+    /**
+     * @return True if response is info about game status
+     */
+    public boolean isGameStatus()
+    {
+        return this.type.equals(ResponseType.GAME_STATUS.name());
+    }
+    
+    /**
      * Return type of response
      * 
      * @return Type (STATUS, MESSAGE..)
