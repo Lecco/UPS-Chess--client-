@@ -67,6 +67,7 @@ public class ChessBoard
      * 
      * @return Printable chessboard 
      */
+    @Override
     public String toString()
     {
         String s = "";

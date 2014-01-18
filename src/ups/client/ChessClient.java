@@ -1,67 +1,68 @@
 package ups.client;
 
 
+import game.*;
 import java.net.*;
 import java.io.*;
+import java.util.Scanner;
 
 public class ChessClient
 {
 
     public static void main(String[] args) throws IOException
     {
-        /*
-        if (args.length < 2) {
-            System.err.println("Usage: java Client1 <IP address> <Port number>");
-            System.exit(0);
-        }
-        */
-        String ip = "127.0.0.1";
+        String ip = "10.0.0.142";
         int port = 10001;
-        BufferedReader in = null;
-        OutputStream out = null;
-        Socket sock = null;
+        
+        Player p = null;
 
         try
         {
-            sock = new Socket(ip, port);
-            out = sock.getOutputStream();
-            in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-
-            String line = "b2c4\n";
-            String response = null;
-            char[] strArray;
-            strArray = line.toCharArray();
-
-            while (true)
+            Game game = new Game(new ChessBoard());
+            p = new Player(new Socket(ip, port));
+            
+            if (p.isConnected())
             {
-                response = in.readLine();
-                System.out.println("response = " + response);
-                for (int index = 0; index < strArray.length; index++)
+                System.out.println("You are now connected.\n");
+                if (p.getResponseParam().equals(Color.WHITE.toString()))
                 {
-                    out.write(strArray[index]);
+                    System.out.println("Your color is white");
+                    p.setColor(Color.WHITE);
                 }
-                out.flush();
-                System.out.println("data sent ");
+                else
+                {
+                    System.out.println("Your color is black");
+                    p.setColor(Color.BLACK);
+                }
+            }
+            
+            String move;
+            Scanner sc = new Scanner(System.in);
+            int moveNumber = 0;
+            
+            while (game.getStatus() != Game.STATUS_CHECKMATE && game.getStatus() != Game.STATUS_STALEMATE)
+            {
+                System.out.println("MOVE " + (++moveNumber));
+                move = sc.nextLine();
+                
+                if (!p.sendMove(move.toCharArray()))
+                {
+                    System.out.println(p.getResponseParam());
+                    continue;
+                }
+                System.out.println(p.getResponseParam());
+                
             }
         }
         catch (IOException ioe)
         {
-            
+            ioe.printStackTrace();
         }
         finally
         {
-            if (in != null)
+            if (p != null)
             {
-                in.close();
-            }
-
-            if (out != null)
-            {
-                out.close();
-            }
-            if (sock != null)
-            {
-                sock.close();
+                p.closeConnection();
             }
         }
     }
