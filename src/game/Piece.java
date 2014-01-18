@@ -3,23 +3,13 @@ package game;
 
 /**
  * Instances of {@code Piece} are chess pieces on chessboard, they have info
- * about their type (knight, king, pawn..), color and position.
+ * about their type (knight, king, pawn..), color.
  *
  * @author Oldřich Pulkrt <O.Pulkrt@gmail.com>
  * @version 1.0
  */
 public class Piece
 {
-    /**
-     * X coordinate of this chess piece
-     */
-    int positionX;
-    
-    /**
-     * Y coordinate of this chess piece
-     */
-    int positionY;
-    
     /**
      * Color of this chess piece
      */
@@ -38,44 +28,10 @@ public class Piece
      * @param color Color of chess piece
      * @param type Type of chess piece
      */
-    public Piece(int positionX, int positionY, Color color, ChessType type)
+    public Piece(Color color, ChessType type)
     {
-        this.positionX = positionX;
-        this.positionY = positionY;
         this.color = color;
         this.type = type;
-    }
-    
-    /**
-     * @return X coordinate
-     */
-    public int getPositionX()
-    {
-        return positionX;
-    }
-
-    /**
-     * @param positionX New x coordinate
-     */
-    public void setPositionX(int positionX)
-    {
-        this.positionX = positionX;
-    }
-
-    /**
-     * @return Y coordinate
-     */
-    public int getPositionY()
-    {
-        return positionY;
-    }
-
-    /**
-     * @param positionY New y coordinate
-     */
-    public void setPositionY(int positionY)
-    {
-        this.positionY = positionY;
     }
 
     /**
