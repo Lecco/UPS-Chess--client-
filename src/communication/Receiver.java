@@ -51,6 +51,11 @@ public class Receiver
         try
         {
             String text = reader.readLine();
+            if (text == null)
+            {
+                System.out.println("Server is down, wait a few moments and try restarting client.");
+                System.exit(1);
+            }
             return new Response(text);
         }
         catch (IOException e)

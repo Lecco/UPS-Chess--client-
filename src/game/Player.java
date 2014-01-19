@@ -133,7 +133,8 @@ public class Player
      */
     public Response getResponse()
     {
-        return receiver.getResponse();
+        Response r = receiver.getResponse();
+        return r;
     }
     
     /**

@@ -69,6 +69,7 @@ public class ChessClient
                 {
                     System.out.print("Incoming move: ");
                     r = p.getResponse();
+                    
                     if (r.isMove())
                     {
                         System.out.println(r.getParam());
