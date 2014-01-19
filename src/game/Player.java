@@ -18,6 +18,9 @@ import java.net.Socket;
  */
 public class Player
 {
+    public final static String WHITE_PLAYER = "WHITE_PLAYER";
+    public final static String BLACK_PLAYER = "BLACK_PLAYER";
+    
     /**
      * Socket for connection to server
      */

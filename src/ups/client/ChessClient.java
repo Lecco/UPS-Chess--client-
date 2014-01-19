@@ -56,6 +56,7 @@ public class ChessClient
                         {
                             System.out.println(r.getParam());
                         }
+                        moveNumber--;
                         continue;
                     }
                     r = p.getResponse();
@@ -81,6 +82,29 @@ public class ChessClient
                     if (r.getParam().equals(Game.STATUS_CHECKMATE))
                     {
                         game.setStatus(Game.STATUS_CHECKMATE);
+                        r = p.getResponse();
+                        if (r.getType().equals(Player.WHITE_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                        {
+                            if (p.getColor().name().equals(Color.WHITE.name()))
+                            {
+                                System.out.println("You lose.");
+                            }
+                            else
+                            {
+                                System.out.println("You win.");
+                            }
+                        }
+                        if (r.getType().equals(Player.BLACK_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                        {
+                            if (p.getColor().name().equals(Color.BLACK.name()))
+                            {
+                                System.out.println("You lose.");
+                            }
+                            else
+                            {
+                                System.out.println("You win.");
+                            }
+                        }
                     }
                     if (r.getParam().equals(Game.STATUS_STALEMATE))
                     {
