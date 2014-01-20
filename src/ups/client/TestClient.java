@@ -1,7 +1,10 @@
 package ups.client;
 
 
+import communication.Response;
+import game.ChessBoard;
 import game.Color;
+import game.Game;
 import game.Player;
 import java.net.*;
 import java.io.*;
@@ -25,6 +28,7 @@ public class TestClient
 
         try
         {
+            Game game = new Game(new ChessBoard());
             p1 = new Player(new Socket(ip, port));
             p2 = new Player(new Socket(ip, port));
             
@@ -60,26 +64,146 @@ public class TestClient
             
             // String game[] = new String[]{"e2e4\n", "e7e5\n", "d2d3\n", "b8a6\n"};
             // Fool's mate
-            String game[] = new String[]{"f2f3\n", "e7e5\n", "g2g4\n", "d8h4\n"};
+            String moves[] = new String[]{"f2f3\n", "e7e5\n", "g2g4\n", "d8h4\n"};
             // Shortest stalemate
             //String game[] = new String[]{"e2e3\n", "a7a5\n", "d1h5\n", "a8a6\n", "h5a5\n", "h7h5\n", "h2h4\n", "a6h6\n", "a5c7\n", "f7f6\n", "c7d7\n", "e8f7\n", "d7b7\n", "d8d3\n", "b7b8\n", "d3h7\n", "b8c8\n", "f7g6\n", "c8e6\n"};
-            char[] move;
+            String move;
+            Response r;
             
             Player p = p1;
             
-            for (int i = 0; i < game.length; i++)
+            for (int i = 0; i < moves.length; i++)
             {
                 System.out.println("MOVE " + (i + 1));
-                move = game[i].toCharArray();
-                
-                if (!p.sendMove(move))
+                move = moves[i];
+                move += "\n";
+
+                if (!p.sendMove(move.toCharArray()))
                 {
-                    System.out.println(p.getResponseParam());
+                    r = p.getResponse();
+                    System.out.println("aaa = " + r);
+                    if (r.isMessage())
+                    {
+                        System.out.println(r.getParam());
+                    }
                     i--;
                     continue;
                 }
-                System.out.println(p.getResponseParam());
+                r = p.getResponse();
+                if (r.isMessage())
+                {
+                    System.out.println(r.getParam());
+                }
+                p = (p == p1) ? p2 : p1;
+                System.out.print("Incoming move: ");
+                r = p.getResponse();
+
+                if (r.isMove())
+                {
+                    System.out.println(r.getParam());
+                }
+                p = (p == p1) ? p2 : p1;
+                System.out.print("Game status: ");
+                r = p.getResponse();
+                if (r.isGameStatus())
+                {
+                    System.out.println(r.getParam());
+                    if (r.getParam().equals(Game.STATUS_CHECKMATE))
+                    {
+                        game.setStatus(Game.STATUS_CHECKMATE);
+                        r = p.getResponse();
+                        if (r.getType().equals(Player.WHITE_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                        {
+                            if (p.getColor().name().equals(Color.WHITE.name()))
+                            {
+                                System.out.println("You lose.");
+                            }
+                            else
+                            {
+                                System.out.println("You win.");
+                            }
+                        }
+                        if (r.getType().equals(Player.BLACK_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                        {
+                            if (p.getColor().name().equals(Color.BLACK.name()))
+                            {
+                                System.out.println("You lose.");
+                            }
+                            else
+                            {
+                                System.out.println("You win.");
+                            }
+                        }
+                    }
+                    if (r.getParam().equals(Game.STATUS_STALEMATE))
+                    {
+                        game.setStatus(Game.STATUS_STALEMATE);
+                    }
+                }
                 
+                // check if player is listening
+                r = p.getResponse();
+                r = p.getResponse();
+                if (r.isPlayerStatus())
+                {
+                    // check other players status
+                    if (r.getParam().equals(Player.STATUS_DISCONNECTED))
+                    {
+                        System.out.println("Opponent disconnected.");
+                        System.exit(2);
+                    }
+                }
+                p = (p == p1) ? p2 : p1;
+                System.out.print("Game status: ");
+                r = p.getResponse();
+                if (r.isGameStatus())
+                {
+                    System.out.println(r.getParam());
+                    if (r.getParam().equals(Game.STATUS_CHECKMATE))
+                    {
+                        game.setStatus(Game.STATUS_CHECKMATE);
+                        r = p.getResponse();
+                        if (r.getType().equals(Player.WHITE_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                        {
+                            if (p.getColor().name().equals(Color.WHITE.name()))
+                            {
+                                System.out.println("You lose.");
+                            }
+                            else
+                            {
+                                System.out.println("You win.");
+                            }
+                        }
+                        if (r.getType().equals(Player.BLACK_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                        {
+                            if (p.getColor().name().equals(Color.BLACK.name()))
+                            {
+                                System.out.println("You lose.");
+                            }
+                            else
+                            {
+                                System.out.println("You win.");
+                            }
+                        }
+                    }
+                    if (r.getParam().equals(Game.STATUS_STALEMATE))
+                    {
+                        game.setStatus(Game.STATUS_STALEMATE);
+                    }
+                }
+                
+                // check if player is listening
+                r = p.getResponse();
+                r = p.getResponse();
+                if (r.isPlayerStatus())
+                {
+                    // check other players status
+                    if (r.getParam().equals(Player.STATUS_DISCONNECTED))
+                    {
+                        System.out.println("Opponent disconnected.");
+                        System.exit(2);
+                    }
+                }
                 p = (p == p1) ? p2 : p1;
             }
         }

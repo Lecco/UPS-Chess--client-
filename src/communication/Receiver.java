@@ -1,6 +1,7 @@
 
 package communication;
 
+import game.Player;
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -56,7 +57,16 @@ public class Receiver
                 System.out.println("Server is down, wait a few moments and try restarting client.");
                 System.exit(1);
             }
-            return new Response(text);
+            Response r = new Response(text);
+            if (r.isPlayerStatus())
+            {
+                if (r.getParam().equals(Player.STATUS_DISCONNECTED))
+                {
+                    System.out.println("Opponent disconnected.");
+                    System.exit(2);
+                }
+            }
+            return r;
         }
         catch (IOException e)
         {

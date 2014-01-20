@@ -20,6 +20,7 @@ public class Player
 {
     public final static String WHITE_PLAYER = "WHITE_PLAYER";
     public final static String BLACK_PLAYER = "BLACK_PLAYER";
+    public final static String STATUS_DISCONNECTED = "DISCONNECTED";
     
     /**
      * Socket for connection to server

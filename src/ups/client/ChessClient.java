@@ -112,6 +112,13 @@ public class ChessClient
                         game.setStatus(Game.STATUS_STALEMATE);
                     }
                 }
+                System.out.println("aaa");
+                // check if player is listening
+                r = p.getResponse();
+                System.out.println(r);
+                //checking if other player is connected
+                r = p.getResponse();
+                System.out.println(r);
             }
         }
         catch (IOException ioe)

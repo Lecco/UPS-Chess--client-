@@ -90,6 +90,14 @@ public class Response
     }
     
     /**
+     * @return True if reponse has info about other players status
+     */
+    public boolean isPlayerStatus()
+    {
+        return (this.type.equals(ResponseType.WHITE_STATUS.name()) || this.type.equals(ResponseType.BLACK_STATUS.name()));
+    }
+    
+    /**
      * Return type of response
      * 
      * @return Type (STATUS, MESSAGE..)
@@ -127,6 +135,14 @@ public class Response
     public void setParam(String param)
     {
         this.param = param;
+    }
+    
+    /**
+     * @return String representation of response
+     */
+    public String toString()
+    {
+        return this.type + "---" + this.param;
     }
     
 }
