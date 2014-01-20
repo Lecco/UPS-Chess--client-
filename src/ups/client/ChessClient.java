@@ -12,8 +12,13 @@ public class ChessClient
 
     public static void main(String[] args) throws IOException
     {
-        String ip = "10.0.0.142";
-        int port = 10001;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("IP of server: ");
+        String ip = sc.nextLine();
+        System.out.print("\nPort: ");
+        int port = sc.nextInt();
+        
+        sc.nextLine();
         
         Player p = null;
 
@@ -38,7 +43,6 @@ public class ChessClient
             }
             
             String move;
-            Scanner sc = new Scanner(System.in);
             Response r;
             
             for (int moveNumber = 1; game.getStatus() != Game.STATUS_CHECKMATE && game.getStatus() != Game.STATUS_STALEMATE; moveNumber++)
@@ -49,6 +53,7 @@ public class ChessClient
                     move = sc.nextLine();
                     move += "\n";
 
+                    System.out.println("sending move");
                     if (!p.sendMove(move.toCharArray()))
                     {
                         r = p.getResponse();
