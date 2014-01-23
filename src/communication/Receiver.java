@@ -54,8 +54,12 @@ public class Receiver
             String text = reader.readLine();
             if (text == null)
             {
-                System.out.println("Server is down, wait a few moments and try restarting client.");
-                System.exit(1);
+                text = reader.readLine();
+                if (text == null)
+                {
+                    System.out.println("Server is down, wait a few moments and try restarting client.");
+                    System.exit(1);
+                }
             }
             Response r = new Response(text);
             if (r.isPlayerStatus())

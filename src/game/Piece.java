@@ -64,4 +64,23 @@ public class Piece
     {
         this.type = type;
     }
+    
+    /**
+     * String representation of chess piece
+     * 
+     * @return String representation of chess piece
+     */
+    public String toString()
+    {
+        String piece = this.type.name().charAt(0) + "" + this.type.name().charAt(1);
+        if (this.color == Color.BLACK)
+        {
+            piece += "B";
+        }
+        else
+        {
+            piece += "W";
+        }
+        return piece;
+    }
 }

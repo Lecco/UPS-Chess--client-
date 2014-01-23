@@ -63,6 +63,29 @@ public class ChessBoard
     }
     
     /**
+     * Perform move
+     * 
+     * @param move
+     */
+    public void move(int[] move)
+    {
+        this.board[move[3]][move[2]] = this.board[move[1]][move[0]];
+        this.board[move[1]][move[0]] = null;
+    }
+    
+    private void printChessBoard()
+    {
+        for (int i = ChessBoard.LENGTH - 1; i >= 0; i--)
+        {
+            for (int j = 0; j < ChessBoard.LENGTH; j++)
+            {
+                System.out.print("move[" + i + "][" + j + "] = ");
+                System.out.println(this.board[i][j]);
+            }
+        }
+    }
+    
+    /**
      * Returns string representation of chess board
      * 
      * @return Printable chessboard 
@@ -71,11 +94,18 @@ public class ChessBoard
     public String toString()
     {
         String s = "";
-        for (int i = 0; i < ChessBoard.LENGTH; i++)
+        for (int i = ChessBoard.LENGTH - 1; i >= 0; i--)
         {
             for (int j = 0; j < ChessBoard.LENGTH; j++)
             {
-                s += this.board[i][j].getType().name();
+                if (this.board[i][j] == null)
+                {
+                    s += " X  ";
+                }
+                else
+                {
+                    s += this.board[i][j].toString() + " ";
+                }
             }
             s += "\n";
         }

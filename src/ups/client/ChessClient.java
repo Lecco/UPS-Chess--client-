@@ -53,7 +53,6 @@ public class ChessClient
                     move = sc.nextLine();
                     move += "\n";
 
-                    System.out.println("sending move");
                     if (!p.sendMove(move.toCharArray()))
                     {
                         r = p.getResponse();
@@ -63,6 +62,10 @@ public class ChessClient
                         }
                         moveNumber--;
                         continue;
+                    }
+                    else
+                    {
+                        game.makeMove(move);
                     }
                     r = p.getResponse();
                     if (r.isMessage())
@@ -78,8 +81,10 @@ public class ChessClient
                     if (r.isMove())
                     {
                         System.out.println(r.getParam());
+                        game.makeMove(r.getParam());
                     }
                 }
+                System.out.println(game.getChessboard());
                 System.out.print("Game status: ");
                 r = p.getResponse();
                 if (r.isGameStatus())
