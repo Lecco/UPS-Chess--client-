@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Instances of {@code Player} represent chess players.
@@ -21,6 +23,7 @@ public class Player
     public final static String WHITE_PLAYER = "WHITE_PLAYER";
     public final static String BLACK_PLAYER = "BLACK_PLAYER";
     public final static String STATUS_DISCONNECTED = "DISCONNECTED";
+    public final static String STATUS_CONNECTED = "CONNECTED";
     
     /**
      * Socket for connection to server
@@ -97,6 +100,18 @@ public class Player
         Response r = receiver.getResponse();
         return r.isSuccess();
     }
+    
+    /**
+     * Send message to server and return true if it was succesful
+     * 
+     * @param message Message
+     * @throws IOException 
+     */
+    public void send(String message) throws IOException
+    {
+        message = message + "\n";
+        sender.send(message.toCharArray());
+    }
 
     /**
      * Close connection of player to server
@@ -135,6 +150,19 @@ public class Player
     public Response getResponse()
     {
         Response r = receiver.getResponse();
+        if (r.isPlayerStatus() && 
+                ((this.getColor() == Color.WHITE && r.getType().equals(Player.WHITE_PLAYER)) ||
+                 (this.getColor() == Color.BLACK && r.getType().equals(Player.BLACK_PLAYER))))
+        {
+            String message = this.getColor().name() + "---" + Player.STATUS_CONNECTED;
+            try
+            {
+                this.sender.send(message.toCharArray());
+            } catch (IOException ex)
+            {
+                Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return r;
     }
     

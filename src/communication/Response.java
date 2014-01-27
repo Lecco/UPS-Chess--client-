@@ -12,7 +12,7 @@ public class Response
     /**
      * Separator of response type and other parameters
      */
-    final static String SEPARATOR = "---";
+    public final static String SEPARATOR = "---";
     
     /**
      * Type of response
@@ -78,7 +78,12 @@ public class Response
      */
     public boolean isMove()
     {
-        return this.type.equals(ResponseType.MOVE.name());
+        boolean isMove = this.type.equals(ResponseType.MOVE.name());
+        if (isMove)
+        {
+            this.param = this.param.substring(0, 4);
+        }
+        return isMove;
     }
     
     /**

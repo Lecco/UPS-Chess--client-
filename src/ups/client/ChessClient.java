@@ -2,10 +2,14 @@ package ups.client;
 
 
 import communication.Response;
+import communication.ResponseParam;
+import communication.ResponseType;
 import game.*;
 import java.net.*;
 import java.io.*;
+import java.util.InputMismatchException;
 import java.util.Scanner;
+import sun.net.util.IPAddressUtil;
 
 public class ChessClient
 {
@@ -13,19 +17,54 @@ public class ChessClient
     public static void main(String[] args) throws IOException
     {
         Scanner sc = new Scanner(System.in);
-        System.out.print("IP of server: ");
-        String ip = sc.nextLine();
-        System.out.print("\nPort: ");
-        int port = sc.nextInt();
-        
-        sc.nextLine();
+        String ip = null;
+        do
+        {
+            System.out.print("IP of server: ");
+            ip = sc.nextLine();
+            if (!IPAddressUtil.isIPv4LiteralAddress(ip) && !IPAddressUtil.isIPv6LiteralAddress(ip))
+            {
+                /*
+                InetAddress[] asdf = InetAddress.getAllByName(ip);
+                for (int i = 0; i < asdf.length;i++)
+                {
+                    System.out.println(asdf[i].getHostAddress());
+                }*/
+                System.out.println("Not valid IP address.");
+            }
+        }
+        while (!IPAddressUtil.isIPv4LiteralAddress(ip) && !IPAddressUtil.isIPv6LiteralAddress(ip));
+
+        boolean portSet = false;
+        int port = -1;
+        while (!portSet)
+        {
+            try
+            {
+                System.out.print("\nPort: ");
+                port = Integer.parseInt(sc.nextLine());
+                if (port < 1024 || port >= 65536)
+                {
+                    throw new NumberFormatException();
+                }
+                portSet = true;
+            }
+            catch (NumberFormatException e)
+            {
+                System.out.println("Invalid port number, choose port number in range 1024-65535");
+                portSet = false;
+                port = -1;
+            }
+        }
         
         Player p = null;
 
         try
         {
+            Response r;
             Game game = new Game(new ChessBoard());
             p = new Player(new Socket(ip, port));
+            p.send(ResponseType.STATUS + Response.SEPARATOR + ResponseParam.SUCCESS);
             
             if (p.isConnected())
             {
@@ -40,22 +79,46 @@ public class ChessClient
                     System.out.println("Your color is black");
                     p.setColor(Color.BLACK);
                 }
+                System.out.println("Waiting for other player...");
+                r = p.getResponse();
+                if (r.isPlayerStatus())
+                {
+                    if (r.getParam().equals(ResponseParam.CONNECTED.name()))
+                    {
+                        System.out.println("Other player connected.");
+                    }
+                }
             }
             
             String move;
-            Response r;
             
             for (int moveNumber = 1; game.getStatus() != Game.STATUS_CHECKMATE && game.getStatus() != Game.STATUS_STALEMATE; moveNumber++)
             {
+                System.out.println(game.getChessboard());
                 System.out.println("MOVE " + moveNumber);
                 if ((p.getColor() == Color.WHITE && moveNumber % 2 == 1) || (p.getColor() == Color.BLACK && moveNumber % 2 == 0))
                 {
+                    System.out.print("Your move (for example e2e4): ");
                     move = sc.nextLine();
+                    if (move.length() != 4)
+                    {
+                        System.out.println("Invalid move.");
+                        moveNumber--;
+                        continue;
+                    }
                     move += "\n";
 
                     if (!p.sendMove(move.toCharArray()))
                     {
                         r = p.getResponse();
+                        if (r.isPlayerStatus())
+                        {
+                            if (r.getParam().equals(ResponseParam.DISCONNECTED.name()))
+                            {
+                                System.out.println("Other player disconnected.");
+                                break;
+                            }
+                        }
                         if (r.isMessage())
                         {
                             System.out.println(r.getParam());
@@ -76,15 +139,19 @@ public class ChessClient
                 else
                 {
                     System.out.print("Incoming move: ");
-                    r = p.getResponse();
                     
-                    if (r.isMove())
+                    do 
                     {
-                        System.out.println(r.getParam());
-                        game.makeMove(r.getParam());
+                        r = p.getResponse();
+
+                        if (r.isMove() || r.isMessage())
+                        {
+                            System.out.println(r.getParam());
+                            game.makeMove(r.getParam());
+                        }
                     }
+                    while (!r.isMove());
                 }
-                System.out.println(game.getChessboard());
                 System.out.print("Game status: ");
                 r = p.getResponse();
                 if (r.isGameStatus())
@@ -127,6 +194,7 @@ public class ChessClient
                 //checking if other player is connected
                 r = p.getResponse();
             }
+            System.out.println("Game ended.");
         }
         catch (IOException ioe)
         {
