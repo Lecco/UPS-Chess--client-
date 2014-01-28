@@ -11,9 +11,19 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import sun.net.util.IPAddressUtil;
 
+/**
+ * Chess client
+ * 
+ * @author Oldřich Pulkrt <O.Pulkrt@gmail.com>
+ * @version 1.0
+ */
 public class ChessClient
 {
 
+    /**
+     * @param args
+     * @throws IOException 
+     */
     public static void main(String[] args) throws IOException
     {
         Scanner sc = new Scanner(System.in);
@@ -24,12 +34,6 @@ public class ChessClient
             ip = sc.nextLine();
             if (!IPAddressUtil.isIPv4LiteralAddress(ip) && !IPAddressUtil.isIPv6LiteralAddress(ip))
             {
-                /*
-                InetAddress[] asdf = InetAddress.getAllByName(ip);
-                for (int i = 0; i < asdf.length;i++)
-                {
-                    System.out.println(asdf[i].getHostAddress());
-                }*/
                 System.out.println("Not valid IP address.");
             }
         }

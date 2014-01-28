@@ -73,6 +73,9 @@ public class ChessBoard
         this.board[move[1]][move[0]] = null;
     }
     
+    /**
+     * Print chess board
+     */
     private void printChessBoard()
     {
         for (int i = ChessBoard.LENGTH - 1; i >= 0; i--)
@@ -93,7 +96,7 @@ public class ChessBoard
     @Override
     public String toString()
     {
-        String s = "";
+        String s = "\n";
         for (int i = ChessBoard.LENGTH - 1; i >= 0; i--)
         {
             for (int j = 0; j < ChessBoard.LENGTH; j++)
@@ -109,6 +112,6 @@ public class ChessBoard
             }
             s += "\n";
         }
-        return s;
+        return s + "\n";
     }
 }
