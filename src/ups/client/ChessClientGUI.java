@@ -1,10 +1,21 @@
 
 package ups.client;
 
-import javax.swing.*;
+import communication.Response;
+import communication.ResponseParam;
+import communication.ResponseType;
+import game.ChessBoard;
+import game.Game;
+import game.Player;
+import game.Color;
 import java.awt.*;
+import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sun.net.util.IPAddressUtil;
 
 /**
@@ -20,6 +31,8 @@ public class ChessClientGUI
     public final static String LABELS = " ABCDEFGH";
     String moveFrom;
     String moveTo;
+    Game game;
+    Player p;
 
     private void initFrame()
     {
@@ -33,9 +46,9 @@ public class ChessClientGUI
                 if (j != 0 && i != 8)
                 {
                     if ((i + j - 1) % 2 == 0) {
-                        squares[i][j].setBackground(Color.DARK_GRAY);
+                        squares[i][j].setBackground(java.awt.Color.DARK_GRAY);
                     } else {
-                        squares[i][j].setBackground(Color.white);
+                        squares[i][j].setBackground(java.awt.Color.white);
                     }
                 }
                 frame.add(squares[i][j]);
@@ -113,44 +126,209 @@ public class ChessClientGUI
                 port = -1;
             }
         }
+        
+        startGame(ip, port);
+    }
+    
+    private void startGame(String ip, int port)
+    {
+        try
+        {
+            Response r;
+            game = new Game(new ChessBoard());
+            p = new Player(new Socket(ip, port));
+            p.send(ResponseType.STATUS + Response.SEPARATOR + ResponseParam.SUCCESS);
+            
+            if (p.isConnected())
+            {
+                JOptionPane.showMessageDialog(frame, "You are now connected.\n", "Connection success", JOptionPane.INFORMATION_MESSAGE);
+                if (p.getResponseParam().equals(Color.WHITE.toString()))
+                {
+                    JOptionPane.showMessageDialog(frame, "Your color is white.");
+                    p.setColor(Color.WHITE);
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(frame, "Your color is black");
+                    p.setColor(Color.BLACK);
+                }
+                
+                JDialog dialog = new JDialog(frame, false);
+                JOptionPane optionPane = new JOptionPane("Waiting for other player...");
+                dialog.getContentPane().add(optionPane);
+                dialog.pack();
+                dialog.setVisible(true);
+                
+                r = p.getResponse();
+                if (r.isPlayerStatus())
+                {
+                    if (r.getParam().equals(ResponseParam.CONNECTED.name()))
+                    {
+                        Window[] windows = Window.getWindows();
+                        for (Window window : windows)
+                        {
+                            if (window instanceof JDialog)
+                            {
+                                JDialog d = (JDialog) window;
+                                if (d.getContentPane().getComponentCount() == 1
+                                    && d.getContentPane().getComponent(0) instanceof JOptionPane)
+                                {
+                                    d.dispose();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+    }
+    
+    private void getIncomingMove()
+    {
+        Response r;
+        JDialog dialog = new JDialog(frame, false);
+        JOptionPane optionPane = new JOptionPane("Waiting for other player's move...");
+        dialog.getContentPane().add(optionPane);
+        dialog.pack();
+        dialog.setVisible(true);
+        
+        do
+        {
+            r = p.getResponse();
+
+            if (r.isMove() || r.isMessage())
+            {
+                JOptionPane.showMessageDialog(frame, r.getParam());
+                game.makeMove(r.getParam());
+
+                Window[] windows = Window.getWindows();
+                for (Window window : windows)
+                {
+                    if (window instanceof JDialog)
+                    {
+                        JDialog d = (JDialog) window;
+                        if (d.getContentPane().getComponentCount() == 1
+                            && d.getContentPane().getComponent(0) instanceof JOptionPane)
+                        {
+                            d.dispose();
+                        }
+                    }
+                }
+            }
+        }
+        while (!r.isMove());
     }
     
     private void initMouseListeners()
     {
-        squares[0][1].addMouseListener(new MouseListener(){
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 1; j < 9; j++)
+            {
+                final String from = ChessClientGUI.LABELS.substring(j, j + 1).toLowerCase() + "" + (8 - i);
+                final String to = ChessClientGUI.LABELS.substring(j, j + 1).toLowerCase() + "" + (8 - i);
+                squares[i][j].addMouseListener(new MouseListener(){
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                    }
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.out.println("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (moveFrom == null || moveFrom.length() == 0)
+                        {
+                            moveFrom = from;
+                        }
+                        else
+                        {
+                            moveTo = to;
+                            String move = moveFrom + moveTo + "\n";
+                            Response r;
+                            try
+                            {
+                                if (!p.sendMove(move.toCharArray()))
+                                {
+                                    r = p.getResponse();
+                                    if (r.isPlayerStatus())
+                                    {
+                                        if (r.getParam().equals(ResponseParam.DISCONNECTED.name()))
+                                        {
+                                            System.out.println("Other player disconnected.");
+                                        }
+                                    }
+                                    if (r.isMessage())
+                                    {
+                                        System.out.println(r.getParam());
+                                    }
+                                }
+                                else
+                                {
+                                    game.makeMove(move);
+                                }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                System.out.println("Macknul"); //To change body of generated methods, choose Tools | Templates.
-            }
+                                moveFrom = "";
+                            }
+                            catch (IOException ex)
+                            {
+                            }
+                        }
+                    }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                System.out.println("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                    }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                System.out.println("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                    }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                System.out.println("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                    }
+                });
             }
-            
-        });
+        }
+    }
+    
+    private void chessGame()
+    {
+        Response r;
+        if (p.getColor() == Color.BLACK)
+        {
+            getIncomingMove();
+            //r = p.getResponse();
+            //System.out.println(r);
+        }
+        else
+        {
+            try
+            {
+                String pokus = "aaaa\n";
+                p.sendMove(pokus.toCharArray());
+            }
+            catch(IOException e)
+            {
+                
+            }
+        }
     }
     
     public ChessClientGUI()
     {
         initFrame();
         initMouseListeners();
+        chessGame();
+        
+        
+        System.out.println("tady to konci");
+        
+        if (p != null)
+        {
+            p.closeConnection();
+        }
     }
 
     public static void main(String[] args)
