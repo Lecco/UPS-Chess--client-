@@ -61,23 +61,23 @@ public class ChessClientGUI
             }
         }
         
-        squares[7][1].add(new JLabel(new ImageIcon("rook-white.png")));
-        squares[7][2].add(new JLabel(new ImageIcon("knight-white.png")));
-        squares[7][3].add(new JLabel(new ImageIcon("bishop-white.png")));
-        squares[7][4].add(new JLabel(new ImageIcon("queen-white.png")));
-        squares[7][5].add(new JLabel(new ImageIcon("king-white.png")));
-        squares[7][6].add(new JLabel(new ImageIcon("bishop-white.png")));
-        squares[7][7].add(new JLabel(new ImageIcon("knight-white.png")));
-        squares[7][8].add(new JLabel(new ImageIcon("rook-white.png")));
+        squares[7][1].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/rook-white.png"))));
+        squares[7][2].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/knight-white.png"))));
+        squares[7][3].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/bishop-white.png"))));
+        squares[7][4].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/queen-white.png"))));
+        squares[7][5].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/king-white.png"))));
+        squares[7][6].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/bishop-white.png"))));
+        squares[7][7].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/knight-white.png"))));
+        squares[7][8].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/rook-white.png"))));
 
-        squares[0][1].add(new JLabel(new ImageIcon("rook-black.png")));
-        squares[0][2].add(new JLabel(new ImageIcon("knight-black.png")));
-        squares[0][3].add(new JLabel(new ImageIcon("bishop-black.png")));
-        squares[0][4].add(new JLabel(new ImageIcon("queen-black.png")));
-        squares[0][5].add(new JLabel(new ImageIcon("king-black.png")));
-        squares[0][6].add(new JLabel(new ImageIcon("bishop-black.png")));
-        squares[0][7].add(new JLabel(new ImageIcon("knight-black.png")));
-        squares[0][8].add(new JLabel(new ImageIcon("rook-black.png")));
+        squares[0][1].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/rook-black.png"))));
+        squares[0][2].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/knight-black.png"))));
+        squares[0][3].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/bishop-black.png"))));
+        squares[0][4].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/queen-black.png"))));
+        squares[0][5].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/king-black.png"))));
+        squares[0][6].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/bishop-black.png"))));
+        squares[0][7].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/knight-black.png"))));
+        squares[0][8].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/rook-black.png"))));
         
         for (int i = 0; i < 9; i++)
         {
@@ -89,8 +89,8 @@ public class ChessClientGUI
         }
 
         for (int i = 1; i < 9; i++) {
-            squares[6][i].add(new JLabel(new ImageIcon("pawn-white.png")));
-            squares[1][i].add(new JLabel(new ImageIcon("pawn-black.png")));
+            squares[6][i].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/pawn-white.png"))));
+            squares[1][i].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/pawn-black.png"))));
         }
         
         frame.setVisible(true);
@@ -471,7 +471,7 @@ public class ChessClientGUI
                 
                 if (image.length() > 0)
                 {
-                    squares[7 - i][j + 1].add(new JLabel(new ImageIcon(image)));
+                    squares[7 - i][j + 1].add(new JLabel(new ImageIcon(this.getClass().getResource("/images/" + image))));
                 }
             }
         }
@@ -497,7 +497,15 @@ public class ChessClientGUI
     public ChessClientGUI()
     {
         initFrame();
-        initConnection();
+        try
+        {
+            initConnection();
+        }
+        catch (NullPointerException e)
+        {
+            System.out.println("You must input IP and port.");
+            System.exit(3);
+        }
         showChessBoard(game.getChessboard().getChessBoard());
         chessGame();
     }
