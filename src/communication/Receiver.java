@@ -57,7 +57,7 @@ public class Receiver
                 text = reader.readLine();
                 if (text == null)
                 {
-                    System.out.println("Server is down, wait a few moments and try restarting client.");
+                    System.out.println("Server or other player is down.");
                     System.exit(1);
                 }
             }

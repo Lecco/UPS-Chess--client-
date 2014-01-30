@@ -12,7 +12,7 @@ public class ChessBoard
     /**
      * Length of chessboard
      */
-    final static int LENGTH = 8;
+    public final static int LENGTH = 8;
     
     /**
      * Board consists of pieces or NULL where aren't any pieces
@@ -113,5 +113,14 @@ public class ChessBoard
             s += "\n";
         }
         return s + "\n";
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public Piece[][] getChessBoard()
+    {
+        return this.board;
     }
 }

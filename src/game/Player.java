@@ -118,6 +118,7 @@ public class Player
      */
     public void closeConnection()
     {
+        System.out.println("zavirame");
         try
         {
             receiver.closeConnection();

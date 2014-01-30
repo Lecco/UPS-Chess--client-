@@ -5,9 +5,11 @@ import communication.Response;
 import communication.ResponseParam;
 import communication.ResponseType;
 import game.ChessBoard;
+import game.ChessType;
 import game.Game;
 import game.Player;
 import game.Color;
+import game.Piece;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -33,13 +35,17 @@ public class ChessClientGUI
     String moveTo;
     Game game;
     Player p;
+    boolean isTurn;
 
+    /**
+     * First initialization of chess window
+     */
     private void initFrame()
     {
         frame = new JFrame("Chess GUI Client");
         frame.setSize(630, 630);
         frame.setLayout(new GridLayout(9, 9));
-
+        
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 squares[i][j] = new JPanel();
@@ -86,13 +92,15 @@ public class ChessClientGUI
             squares[6][i].add(new JLabel(new ImageIcon("pawn-white.png")));
             squares[1][i].add(new JLabel(new ImageIcon("pawn-black.png")));
         }
-
+        
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        initConnection();
     }
     
+    /**
+     * Initialize connection
+     */
     private void initConnection()
     {
         String ip = null;
@@ -130,6 +138,12 @@ public class ChessClientGUI
         startGame(ip, port);
     }
     
+    /**
+     * Start game
+     * 
+     * @param ip Ip address
+     * @param port Port
+     */
     private void startGame(String ip, int port)
     {
         try
@@ -187,24 +201,31 @@ public class ChessClientGUI
         }
     }
     
+    /**
+     * Get incoming move from other player
+     */
     private void getIncomingMove()
     {
+        showChessBoard(game.getChessboard().getChessBoard());
         Response r;
-        JDialog dialog = new JDialog(frame, false);
-        JOptionPane optionPane = new JOptionPane("Waiting for other player's move...");
-        dialog.getContentPane().add(optionPane);
-        dialog.pack();
-        dialog.setVisible(true);
+        //JOptionPane.showMessageDialog(frame, "poku8s");
+       // JDialog dialog = new JDialog(frame, false);
+        JOptionPane.showMessageDialog(frame, "Waiting for other player's move...");
+        //JOptionPane optionPane = new JOptionPane("Waiting for other player's move...");
+        //dialog.getContentPane().add(optionPane);
+        //dialog.pack();
+        //dialog.setVisible(true);
         
         do
         {
             r = p.getResponse();
 
-            if (r.isMove() || r.isMessage())
+            if (r.isMove())
             {
-                JOptionPane.showMessageDialog(frame, r.getParam());
                 game.makeMove(r.getParam());
-
+                showChessBoard(game.getChessboard().getChessBoard());
+                
+                /*
                 Window[] windows = Window.getWindows();
                 for (Window window : windows)
                 {
@@ -217,12 +238,18 @@ public class ChessClientGUI
                             d.dispose();
                         }
                     }
-                }
+                }*/
+                isTurn = !isTurn;
+                getGameStatus();
+                checkConnection();
             }
         }
         while (!r.isMove());
     }
     
+    /**
+     * Init mouse listeners, so player can move pieces
+     */
     private void initMouseListeners()
     {
         for (int i = 0; i < 8; i++)
@@ -238,6 +265,10 @@ public class ChessClientGUI
 
                     @Override
                     public void mousePressed(MouseEvent e) {
+                        if (!isTurn)
+                        {
+                            return;
+                        }
                         if (moveFrom == null || moveFrom.length() == 0)
                         {
                             moveFrom = from;
@@ -246,6 +277,7 @@ public class ChessClientGUI
                         {
                             moveTo = to;
                             String move = moveFrom + moveTo + "\n";
+                            
                             Response r;
                             try
                             {
@@ -261,12 +293,19 @@ public class ChessClientGUI
                                     }
                                     if (r.isMessage())
                                     {
-                                        System.out.println(r.getParam());
+                                        JOptionPane.showMessageDialog(frame, r.getParam());
                                     }
                                 }
                                 else
                                 {
+                                    r = p.getResponse();
                                     game.makeMove(move);
+                                    getGameStatus();
+                                    isTurn = !isTurn;
+                                    moveFrom = "";
+                                    showChessBoard(game.getChessboard().getChessBoard());
+                                    checkConnection();
+                                    getIncomingMove();
                                 }
 
                                 moveFrom = "";
@@ -293,44 +332,181 @@ public class ChessClientGUI
         }
     }
     
+    private void checkConnection()
+    {
+        Response r;
+        r = p.getResponse();
+        r = p.getResponse();
+    }
+    
+    /**
+     * Get game status
+     */
+    private void getGameStatus()
+    {
+        Response r = p.getResponse();
+        if (r.isGameStatus())
+        {
+            if (r.getParam().equals(Game.STATUS_CHECKMATE))
+            {
+                game.setStatus(Game.STATUS_CHECKMATE);
+                r = p.getResponse();
+                if (r.getType().equals(Player.WHITE_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                {
+                    if (p.getColor().name().equals(Color.WHITE.name()))
+                    {
+                        JOptionPane.showMessageDialog(frame, "You lose.");
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(frame, "You win.");
+                    }
+                }
+                if (r.getType().equals(Player.BLACK_PLAYER) && r.getParam().equals(Game.STATUS_CHECKMATE))
+                {
+                    if (p.getColor().name().equals(Color.BLACK.name()))
+                    {
+                        JOptionPane.showMessageDialog(frame, "You lose.");
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(frame, "You win.");
+                    }
+                }
+                if (p != null)
+                {
+                    p.closeConnection();
+                }
+            }
+            if (r.getParam().equals(Game.STATUS_STALEMATE))
+            {
+                game.setStatus(Game.STATUS_STALEMATE);
+            }
+        }
+    }
+    
+    /**
+     * Exchange moves
+     */
     private void chessGame()
     {
         Response r;
         if (p.getColor() == Color.BLACK)
         {
+            isTurn = false;
             getIncomingMove();
-            //r = p.getResponse();
-            //System.out.println(r);
         }
         else
         {
-            try
-            {
-                String pokus = "aaaa\n";
-                p.sendMove(pokus.toCharArray());
-            }
-            catch(IOException e)
-            {
-                
-            }
+            isTurn = true;
         }
     }
     
+    /**
+     * Show chessboard in window
+     * @param board 
+     */
+    private void showChessBoard(Piece[][] board)
+    {
+        frame.getContentPane().removeAll();
+        
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                squares[i][j].removeAll();
+                squares[i][j] = new JPanel();
+                if (j != 0 && i != 8)
+                {
+                    if ((i + j - 1) % 2 == 0) {
+                        squares[i][j].setBackground(java.awt.Color.DARK_GRAY);
+                    } else {
+                        squares[i][j].setBackground(java.awt.Color.white);
+                    }
+                }
+                frame.add(squares[i][j]);
+            }
+        }
+        
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (board[i][j] == null)
+                {
+                    continue;
+                }
+                String image = "";
+                if (board[i][j].getType() == ChessType.BISHOP)
+                {
+                    image = "bishop-";
+                }
+                if (board[i][j].getType() == ChessType.KING)
+                {
+                    image = "king-";
+                }
+                if (board[i][j].getType() == ChessType.KNIGHT)
+                {
+                    image = "knight-";
+                }
+                if (board[i][j].getType() == ChessType.PAWN)
+                {
+                    image = "pawn-";
+                }
+                if (board[i][j].getType() == ChessType.QUEEN)
+                {
+                    image = "queen-";
+                }
+                if (board[i][j].getType() == ChessType.ROOK)
+                {
+                    image = "rook-";
+                }
+                
+                if (board[i][j].getColor() == Color.BLACK)
+                {
+                    image = image + "black.png";
+                }
+                if (board[i][j].getColor() == Color.WHITE)
+                {
+                    image = image + "white.png";
+                }
+                
+                if (image.length() > 0)
+                {
+                    squares[7 - i][j + 1].add(new JLabel(new ImageIcon(image)));
+                }
+            }
+        }
+        
+        for (int i = 0; i < 9; i++)
+        {
+            if (i < 9)
+            {
+                squares[i][0].add(new JLabel("" + (8 - i)));
+            }
+            squares[8][i].add(new JLabel(ChessClientGUI.LABELS.substring(i, i + 1)));
+        }
+        
+        frame.revalidate();
+        frame.repaint();
+
+        initMouseListeners();
+    }
+    
+    /**
+     * Constructor of chess client window
+     */
     public ChessClientGUI()
     {
         initFrame();
-        initMouseListeners();
+        initConnection();
+        showChessBoard(game.getChessboard().getChessBoard());
         chessGame();
-        
-        
-        System.out.println("tady to konci");
-        
-        if (p != null)
-        {
-            p.closeConnection();
-        }
     }
 
+    /**
+     * Main method
+     * 
+     * @param args 
+     */
     public static void main(String[] args)
     {
         new ChessClientGUI();
