@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -195,9 +196,10 @@ public class ChessClientGUI
                 }
             }
         }
-        catch (IOException ioe)
+        catch (Exception ioe)
         {
-            ioe.printStackTrace();
+            System.out.println("Couldn't connect to server.");
+            System.exit(5);
         }
     }
     
