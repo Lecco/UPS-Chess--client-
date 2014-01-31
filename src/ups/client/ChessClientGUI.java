@@ -334,6 +334,10 @@ public class ChessClientGUI
         }
     }
     
+    /**
+     * Check if connection is active (receive message from server and status of 
+     * other player)
+     */
     private void checkConnection()
     {
         Response r;
