@@ -55,6 +55,11 @@ public class Player
         this.socket = socket;
         try
         {
+            this.socket.setKeepAlive(true);
+        }
+        catch (Exception e){}
+        try
+        {
             this.receiver = new Receiver(new BufferedReader(new InputStreamReader(socket.getInputStream())));
             this.sender = new Sender(socket.getOutputStream());
         }

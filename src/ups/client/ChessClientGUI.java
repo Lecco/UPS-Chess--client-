@@ -16,7 +16,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sun.net.util.IPAddressUtil;
@@ -27,7 +29,7 @@ import sun.net.util.IPAddressUtil;
  * @author Oldřich Pulkrt <O.Pulkrt@gmail.com>
  * @version 1.0
  */
-public class ChessClientGUI
+public class ChessClientGUI extends Thread
 {
     JFrame frame;
     JPanel squares[][] = new JPanel[9][9];
@@ -108,6 +110,16 @@ public class ChessClientGUI
         do
         {
             ip = JOptionPane.showInputDialog(frame, "IP address of server: ");
+            InetAddress ipaddress;
+            try
+            {
+                ipaddress = InetAddress.getByName(ip);
+                ip = ipaddress.getHostAddress();
+            }
+            catch (UnknownHostException ex)
+            {
+                
+            }
             if (!IPAddressUtil.isIPv4LiteralAddress(ip) && !IPAddressUtil.isIPv6LiteralAddress(ip))
             {
                 JOptionPane.showMessageDialog(frame, "Not valid IP address.", "Invalid IP", JOptionPane.ERROR_MESSAGE);
@@ -225,7 +237,6 @@ public class ChessClientGUI
             if (r.isMove())
             {
                 game.makeMove(r.getParam());
-                showChessBoard(game.getChessboard().getChessBoard());
                 
                 /*
                 Window[] windows = Window.getWindows();
@@ -242,11 +253,33 @@ public class ChessClientGUI
                     }
                 }*/
                 isTurn = !isTurn;
+                showChessBoard(game.getChessboard().getChessBoard());
                 getGameStatus();
                 checkConnection();
             }
         }
         while (!r.isMove());
+        
+    }
+    
+    public void run()
+    {
+        while (true)
+        {
+            try
+            {
+                if (isTurn)
+                {
+                    p.send("STATUS---SUCCESS");
+                    p.getResponse();
+                }
+                Thread.sleep(1000);
+            }
+            catch (Exception e)
+            {
+
+            }
+        }
     }
     
     /**
@@ -260,6 +293,8 @@ public class ChessClientGUI
             {
                 final String from = ChessClientGUI.LABELS.substring(j, j + 1).toLowerCase() + "" + (8 - i);
                 final String to = ChessClientGUI.LABELS.substring(j, j + 1).toLowerCase() + "" + (8 - i);
+                final int ii = i;
+                final int jj = j;
                 squares[i][j].addMouseListener(new MouseListener(){
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -273,6 +308,7 @@ public class ChessClientGUI
                         }
                         if (moveFrom == null || moveFrom.length() == 0)
                         {
+                            squares[ii][jj].setBackground(java.awt.Color.RED);
                             moveFrom = from;
                         }
                         else
@@ -400,11 +436,13 @@ public class ChessClientGUI
         if (p.getColor() == Color.BLACK)
         {
             isTurn = false;
+            showChessBoard(game.getChessboard().getChessBoard());
             getIncomingMove();
         }
         else
         {
             isTurn = true;
+            showChessBoard(game.getChessboard().getChessBoard());
         }
     }
     
@@ -481,12 +519,44 @@ public class ChessClientGUI
                 }
             }
         }
-        
         for (int i = 0; i < 9; i++)
         {
             if (i < 9)
             {
-                squares[i][0].add(new JLabel("" + (8 - i)));
+                if (i != 8)
+                {
+                    squares[i][0].add(new JLabel("" + (8 - i)));
+                }
+                else
+                {
+                    squares[i][0].add(new JLabel("You: " + p.getColor().toString().substring(0, 1)));
+                    
+                    String text = "";
+                    if (isTurn)
+                    {
+                        if (p.getColor() == Color.WHITE)
+                        {
+                            text = "Move: W";
+                        }
+                        else
+                        {
+                            text = "Move: B";
+                        }
+                    }
+                    else
+                    {
+                        if (p.getColor() == Color.WHITE)
+                        {
+                            text = "Move: B";
+                        }
+                        else
+                        {
+                            text = "Move: W";
+                        }
+                    }
+                    squares[i][0].add(new JLabel(text));
+                    
+                }
             }
             squares[8][i].add(new JLabel(ChessClientGUI.LABELS.substring(i, i + 1)));
         }
@@ -512,7 +582,8 @@ public class ChessClientGUI
             System.out.println("You must input IP and port.");
             System.exit(3);
         }
-        showChessBoard(game.getChessboard().getChessBoard());
+        //showChessBoard(game.getChessboard().getChessBoard());
+        this.start();
         chessGame();
     }
 
