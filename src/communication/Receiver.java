@@ -74,7 +74,8 @@ public class Receiver
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            System.out.println("Server disconnected.");
+            System.exit(2);
         }
         return null;
     }

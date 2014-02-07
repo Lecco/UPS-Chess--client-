@@ -268,16 +268,27 @@ public class ChessClientGUI extends Thread
         {
             try
             {
+                //System.out.print("");
                 if (isTurn)
                 {
+                    //System.out.print("");
                     p.send("STATUS---SUCCESS");
-                    p.getResponse();
+                    Response r = p.getResponse();
+                    //System.out.print("");
+                    //System.out.print("");
+                    //System.out.println(r.toString().length());
+                    if (r.toString().length() < 2)
+                    {
+                        JOptionPane.showMessageDialog(frame, "Server disconnected.");
+                        System.exit(2);
+                    }
                 }
                 Thread.sleep(1000);
             }
             catch (Exception e)
             {
-
+                JOptionPane.showMessageDialog(frame, "Server disconnected.");
+                System.exit(2);
             }
         }
     }
@@ -327,6 +338,7 @@ public class ChessClientGUI extends Thread
                                         if (r.getParam().equals(ResponseParam.DISCONNECTED.name()))
                                         {
                                             System.out.println("Other player disconnected.");
+                                            System.exit(2);
                                         }
                                     }
                                     if (r.isMessage())
@@ -343,6 +355,7 @@ public class ChessClientGUI extends Thread
                                     moveFrom = "";
                                     showChessBoard(game.getChessboard().getChessBoard());
                                     checkConnection();
+                                    showChessBoard(game.getChessboard().getChessBoard());
                                     getIncomingMove();
                                 }
 
